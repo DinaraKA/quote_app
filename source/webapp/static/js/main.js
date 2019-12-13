@@ -62,9 +62,9 @@ function logOut() {
     });
 }
 
-let logInForm, homeLink,  enterLink, exitLink, quoteForm, createLink,
+let logInForm, homeLink,  enterLink, exitLink, quoteForm, createLink, quoteEditForm,
     formSubmit, formTitle, content, formModal, usernameInput, passwordInput,
-    authorInput, textInput, emailInput
+    authorInput, textInput, emailInput,textEditInput,statusVal,ratingInput;
 
 function setUpGlobalVars() {
     logInForm = $('#log_in_form');
@@ -82,6 +82,10 @@ function setUpGlobalVars() {
     authorInput = $('#author_input');
     textInput = $('#text_input');
     emailInput = $('#email_input');
+    quoteEditForm = $('#quote_edit_form');
+    textEditInput = $('#text_edit_input');
+    statusVal = $('#status');
+    ratingInput = $('#rating_input');
 }
 
 function setUpAuth() {
@@ -177,6 +181,53 @@ function setUpCreateQuote(){
     });
 }
 
+function editQuote(id, text, status, rating) {
+    const credentials = {text, status, rating};
+    let request = makeRequest('quote/' + id, 'patch', true, credentials);
+    request.done(function (data) {
+        formModal.modal('hide');
+        content.empty();
+        getQuotes();
+    }).fail(function (response, status, message) {
+        console.log('Quote not changed!');
+        console.log(response.responseText);
+    });
+}
+
+function setUpEditQuote(item){
+    textEditInput.val(item.text);
+    ratingInput.val(item.rating);
+    statusVal.val(item.status);
+    let updateLink = $('#edit_' + item.id);
+    quoteEditForm.on('submit', function(event) {
+        event.preventDefault();
+        editQuote(item.id, textEditInput.val(), statusVal.val(), ratingInput.val());
+    });
+
+    event.preventDefault();
+    logInForm.addClass('d-none');
+    quoteForm.addClass('d-none');
+    quoteEditForm.removeClass('d-none');
+    formTitle.text('Edit');
+    formSubmit.text('Update');
+    formSubmit.off('click');
+    formSubmit.on('click', function(event) {
+        quoteEditForm.submit()
+    });
+
+}
+
+function deleteQuote(id){
+    let request =  makeRequest('quote/' + id, 'delete', true);
+    request.done(function(item) {
+        content.empty();
+        getQuotes()
+    }).fail(function(response, status, message){
+        console.log('Quote can not be deleted!');
+        console.log(response.responseText);
+    });
+}
+
 function getQuotes() {
     let request = makeRequest('quote', 'get', false);
     let token = getToken();
@@ -191,7 +242,9 @@ function getQuotes() {
                     <a href="#" id="detail_${item.id}">More...</a>
                     <p id="rating_${item.id}">Rating: ${item.rating}</p>
                     <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
-                    <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a></p>
+                    <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a>
+                    <a class="btn btn-secondary" style="width: 105px" href="#" id="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
+                    <a class="btn btn-secondary" style="width: 105px" href="#" id="delete_${item.id}">Delete</a></p>
                 </div>`));
                 $('#detail_' + item.id).on('click', function (event) {
                     console.log('click');
@@ -208,7 +261,17 @@ function getQuotes() {
                     event.preventDefault();
                     rateDown(item.id);
                 });
+                $('#edit_' + item.id).on('click', function (event) {
+                    console.log('click');
+                    event.preventDefault();
+                    setUpEditQuote(item);
                 });
+                $('#delete_' + item.id).on('click', function (event) {
+                    console.log('click');
+                    event.preventDefault();
+                    deleteQuote(item.id);
+                });
+            });
         }).fail(function (response, status, message) {
                 console.log('Could not get quotes.');
                 console.log(response.responseText);
@@ -226,7 +289,10 @@ function getOneQuote(id) {
                 <p>Status: ${item.status}</p>
                 <p id="rating_${item.id}">Rating: ${item.rating}</p>
                 <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
-                <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a></p>
+                <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a>
+                <a href="#" class="btn btn-secondary" style="width: 105px" id ="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
+                <a href="#" class="btn btn-secondary" style="width: 105px" id ="delete_${item.id}">Delete</a>
+                <a href="#" class="btn btn-secondary" style="width: 105px" id ="back_${item.id}">Back</a></p>
             </div>`));
         $('#rate_up_' + item.id).on('click', function (event) {
             console.log('click');
@@ -237,6 +303,22 @@ function getOneQuote(id) {
             console.log('click');
             event.preventDefault();
             rateDown(item.id);
+        });
+        $('#edit_' + item.id).on('click', function(event) {
+            console.log('click');
+            event.preventDefault();
+            setUpEditQuote(item);
+        });
+        $('#delete_' + item.id).on('click', function(event) {
+            console.log('click');
+            event.preventDefault();
+            deleteQuote(item.id);
+        });
+        $('#back_' + item.id).on('click', function (event) {
+            console.log('click');
+            event.preventDefault();
+            content.empty();
+            getQuotes();
         });
     }).fail(function (response, status, message) {
         console.log('Quote is unavailable!');
@@ -251,4 +333,5 @@ $(document).ready(function() {
     getQuotes();
     getOneQuote();
     setUpCreateQuote();
+    setUpEditQuote();
 });
