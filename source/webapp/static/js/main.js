@@ -1,11 +1,9 @@
 const baseUrl = 'http://localhost:8000/api/v1/';
 
 function getFullPath(path) {
-
     path = path.replace(/^\/+|\/+$/g, '');
     path = path.replace(/\/{2,}/g, '/');
     return baseUrl + path + '/';
-
 }
 
 function makeRequest(path, method, auth=true, data=null) {
@@ -42,13 +40,44 @@ function logIn(username, password) {
     request.done(function(data, status, response) {
         console.log('Received token');
         saveToken(data.token);
+        formModal.modal('hide');
+        enterLink.addClass('d-none');
+        exitLink.removeClass('d-none');
     }).fail(function(response, status, message) {
         console.log('Could not get token');
-        console.log(response);
+        console.log(response.responseText);
     });
 }
 
+function logOut() {
+    let request = makeRequest('logout', 'post', true);
+    request.done(function(data, status, response) {
+        console.log('Cleaned token');
+        removeToken();
+        enterLink.removeClass('d-none');
+        exitLink.addClass('d-none');
+    }).fail(function(response, status, message) {
+        console.log('Could not clean token');
+        console.log(response.responseText);
+    });
+}
+
+let logInForm, homeLink,  enterLink, exitLink,
+    formSubmit, formTitle, content, formModal, usernameInput, passwordInput
+
+function setUpGlobalVars() {
+    logInForm = $('#log_in_form');
+    homeLink = $('#home_link');
+    enterLink = $('#enter_link');
+    exitLink = $('#exit_link');
+    formSubmit = $('#form_submit');
+    formTitle = $('#form_title');
+    content = $('#content');
+    formModal = $('#form_modal');
+    usernameInput = $('#username_input');
+    passwordInput = $('#password_input');
+}
+
 $(document).ready(function() {
-    let token = getToken();
-    if (!token) logIn('admin', 'admin');
+    setUpGlobalVars();
 });

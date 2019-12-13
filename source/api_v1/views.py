@@ -1,4 +1,5 @@
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -22,13 +23,17 @@ class QuoteViewSet(ModelViewSet):
     queryset = Quote.objects.none()
     serializer_class = QuoteSerializer
 
+
     def get_queryset(self):
         if self.request.user.is_authenticated:
             return Quote.objects.all()
         return Quote.objects.filter(status=CONFIRMED_QUOTE)
+
 
     def get_permissions(self):
         if self.request.method == 'GET' or 'POST':
             return [AllowAny()]
         else:
             return super().get_permissions()
+
+
