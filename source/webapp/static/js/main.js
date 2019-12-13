@@ -114,6 +114,28 @@ function checkAuth() {
     }
 }
 
+function rateUp(id) {
+    let request = makeRequest('quote/' + id + '/rate_up', 'post', false);
+    request.done(function(data, status, response) {
+        console.log('Rated up quote with id ' + id + '.');
+        $('#rating_' + id).text("Rating: " + data.rating);
+    }).fail(function(response, status, message) {
+        console.log('Could not rate up quote with id ' + id + '.');
+        console.log(response.responseText);
+    });
+}
+
+function rateDown(id) {
+    let request = makeRequest('quote/' + id + '/rate_down', 'post', false);
+    request.done(function(data, status, response) {
+        console.log('Rated up quote with id ' + id + '.');
+        $('#rating_' + id).text("Rating: " + data.rating);
+    }).fail(function(response, status, message) {
+        console.log('Could not rate down quote with id ' + id + '.');
+        console.log(response.responseText);
+    });
+}
+
 function getQuotes() {
     let request = makeRequest('quote', 'get', false);
     let token = getToken();
@@ -127,9 +149,24 @@ function getQuotes() {
                     <p>${item.text}</p>
                     <a href="#" id="detail_${item.id}">More...</a>
                     <p id="rating_${item.id}">Rating: ${item.rating}</p>
-  
+                    <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
+                    <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a></p>
                 </div>`));
-
+                $('#detail_' + item.id).on('click', function (event) {
+                    console.log('click');
+                    event.preventDefault();
+                    getOneQuote(item.id);
+                });
+                $('#rate_up_' + item.id).on('click', function (event) {
+                    console.log('click');
+                    event.preventDefault();
+                    rateUp(item.id);
+                });
+                $('#rate_down_' + item.id).on('click', function (event) {
+                    console.log('click');
+                    event.preventDefault();
+                    rateDown(item.id);
+                });
                 });
         }).fail(function (response, status, message) {
                 console.log('Could not get quotes.');
@@ -147,8 +184,19 @@ function getOneQuote(id) {
                 <p>Author: ${item.author}</p>
                 <p>Status: ${item.status}</p>
                 <p id="rating_${item.id}">Rating: ${item.rating}</p>
-             
+                <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
+                <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a></p>
             </div>`));
+        $('#rate_up_' + item.id).on('click', function (event) {
+            console.log('click');
+            event.preventDefault();
+            rateUp(item.id);
+        });
+        $('#rate_down_' + item.id).on('click', function (event) {
+            console.log('click');
+            event.preventDefault();
+            rateDown(item.id);
+        });
     }).fail(function (response, status, message) {
         console.log('Quote is unavailable!');
         console.log(response.responseText);

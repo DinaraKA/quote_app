@@ -37,3 +37,17 @@ class QuoteViewSet(ModelViewSet):
             return super().get_permissions()
 
 
+    @action(methods=['post'], detail=True)
+    def rate_up(self, request, pk=None):
+        quote = self.get_object()
+        quote.rating += 1
+        quote.save()
+        return Response({'id': quote.pk, 'rating': quote.rating})
+
+
+    @action(methods=['post'], detail=True)
+    def rate_down(self, request, pk=None):
+        quote = self.get_object()
+        quote.rating -= 1
+        quote.save()
+        return Response({'id': quote.pk, 'rating': quote.rating})
