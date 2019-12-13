@@ -62,8 +62,9 @@ function logOut() {
     });
 }
 
-let logInForm, homeLink,  enterLink, exitLink,
-    formSubmit, formTitle, content, formModal, usernameInput, passwordInput
+let logInForm, homeLink,  enterLink, exitLink, quoteForm, createLink,
+    formSubmit, formTitle, content, formModal, usernameInput, passwordInput,
+    authorInput, textInput, emailInput
 
 function setUpGlobalVars() {
     logInForm = $('#log_in_form');
@@ -76,6 +77,11 @@ function setUpGlobalVars() {
     formModal = $('#form_modal');
     usernameInput = $('#username_input');
     passwordInput = $('#password_input');
+    quoteForm = $('#quote_form');
+    createLink = $('#create_link');
+    authorInput = $('#author_input');
+    textInput = $('#text_input');
+    emailInput = $('#email_input');
 }
 
 function setUpAuth() {
@@ -133,6 +139,41 @@ function rateDown(id) {
     }).fail(function(response, status, message) {
         console.log('Could not rate down quote with id ' + id + '.');
         console.log(response.responseText);
+    });
+}
+
+function createQuote(text, author, email) {
+    let token = getToken();
+    const credentials = {text, author, email};
+    if (token) {request = makeRequest('quote', 'post', true, credentials);}
+    else{request = makeRequest('quote', 'post', false, credentials);}
+    request.done(function (data) {
+        formModal.modal('hide');
+        content.empty();
+        getQuotes();
+    }).fail(function (response, status, message) {
+        console.log('Quote not added!');
+        console.log(response.responseText);
+    });
+}
+
+function setUpCreateQuote(){
+    quoteForm.on('submit', function(event) {
+        event.preventDefault();
+        createQuote(textInput.val(), authorInput.val(), emailInput.val());
+    });
+
+    createLink.on('click', function(event) {
+        event.preventDefault();
+        logInForm.addClass('d-none');
+        quoteForm.removeClass('d-none');
+        quoteEditForm.addClass('d-none');
+        formTitle.text('Add');
+        formSubmit.text('Save');
+        formSubmit.off('click');
+        formSubmit.on('click', function(event) {
+            quoteForm.submit()
+        });
     });
 }
 
@@ -209,4 +250,5 @@ $(document).ready(function() {
     checkAuth();
     getQuotes();
     getOneQuote();
+    setUpCreateQuote();
 });
