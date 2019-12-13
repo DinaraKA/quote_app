@@ -114,8 +114,51 @@ function checkAuth() {
     }
 }
 
+function getQuotes() {
+    let request = makeRequest('quote', 'get', false);
+    let token = getToken();
+    if (token) {
+        request = makeRequest('quote', 'get', true);
+        request.done(function (data, status, response) {
+            content.empty();
+            console.log(data);
+            data.forEach(function (item, index, array) {
+                content.append($(`<div class="card" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
+                    <p>${item.text}</p>
+                    <a href="#" id="detail_${item.id}">More...</a>
+                    <p id="rating_${item.id}">Rating: ${item.rating}</p>
+  
+                </div>`));
+
+                });
+        }).fail(function (response, status, message) {
+                console.log('Could not get quotes.');
+                console.log(response.responseText);
+            });
+    }
+}
+
+function getOneQuote(id) {
+    let request = makeRequest('quote/' + id, 'get', true);
+    request.done(function (item) {
+        content.empty();
+        content.append($(`<div class="card" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
+                <p>${item.text}</p>
+                <p>Author: ${item.author}</p>
+                <p>Status: ${item.status}</p>
+                <p id="rating_${item.id}">Rating: ${item.rating}</p>
+             
+            </div>`));
+    }).fail(function (response, status, message) {
+        console.log('Quote is unavailable!');
+        console.log(response.responseText);
+    });
+}
+
 $(document).ready(function() {
     setUpGlobalVars();
     setUpAuth();
     checkAuth();
+    getQuotes();
+    getOneQuote();
 });
