@@ -78,6 +78,44 @@ function setUpGlobalVars() {
     passwordInput = $('#password_input');
 }
 
+function setUpAuth() {
+    logInForm.on('submit', function(event) {
+        event.preventDefault();
+        logIn(usernameInput.val(), passwordInput.val());
+    });
+
+    enterLink.on('click', function(event) {
+        event.preventDefault();
+        logInForm.removeClass('d-none');
+        quoteForm.addClass('d-none');
+        quoteEditForm.addClass('d-none');
+        formTitle.text('Login');
+        formSubmit.text('Login');
+        formSubmit.off('click');
+        formSubmit.on('click', function(event) {
+            logInForm.submit();
+        });
+    });
+
+    exitLink.on('click', function(event) {
+        event.preventDefault();
+        logOut();
+    });
+}
+
+function checkAuth() {
+    let token = getToken();
+    if(token) {
+        enterLink.addClass('d-none');
+        exitLink.removeClass('d-none');
+    } else {
+        enterLink.removeClass('d-none');
+        exitLink.addClass('d-none');
+    }
+}
+
 $(document).ready(function() {
     setUpGlobalVars();
+    setUpAuth();
+    checkAuth();
 });
