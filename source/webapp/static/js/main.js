@@ -129,7 +129,7 @@ function checkAuth() {
 }
 
 function rateUp(id) {
-    let request = makeRequest('quote/' + id + '/rate_up', 'post', false);
+    let request = makeRequest('quote/' + id + '/rate_up', 'post', true);
     request.done(function(data, status, response) {
         console.log('Rated up quote with id ' + id + '.');
         $('#rating_' + id).text("Rating: " + data.rating);
@@ -140,7 +140,7 @@ function rateUp(id) {
 }
 
 function rateDown(id) {
-    let request = makeRequest('quote/' + id + '/rate_down', 'post', false);
+    let request = makeRequest('quote/' + id + '/rate_down', 'post', true);
     request.done(function(data, status, response) {
         console.log('Rated up quote with id ' + id + '.');
         $('#rating_' + id).text("Rating: " + data.rating);
@@ -291,6 +291,7 @@ function getOneQuote(id) {
             content.append($(`<div class="card" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
                     <p>${item.text}</p>
                     <p>Author: ${item.author}</p>
+                    <p>Email: ${item.email}</p>
                     <p>Status: ${item.status}</p>
                     <p id="rating_${item.id}">Rating: ${item.rating}</p>
                     <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
