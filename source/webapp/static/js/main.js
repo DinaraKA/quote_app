@@ -43,6 +43,8 @@ function logIn(username, password) {
         formModal.modal('hide');
         enterLink.addClass('d-none');
         exitLink.removeClass('d-none');
+        content.empty();
+        getQuotes();
     }).fail(function(response, status, message) {
         console.log('Could not get token');
         console.log(response.responseText);
@@ -56,6 +58,8 @@ function logOut() {
         removeToken();
         enterLink.removeClass('d-none');
         exitLink.addClass('d-none');
+        content.empty();
+        getQuotes();
     }).fail(function(response, status, message) {
         console.log('Could not clean token');
         console.log(response.responseText);
@@ -231,20 +235,19 @@ function deleteQuote(id){
 function getQuotes() {
     let request = makeRequest('quote', 'get', false);
     let token = getToken();
-    if (token) {
-        request = makeRequest('quote', 'get', true);
+    if (token) {request = makeRequest('quote', 'get', true);}
         request.done(function (data, status, response) {
             content.empty();
             console.log(data);
             data.forEach(function (item, index, array) {
-                content.append($(`<div class="card" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
+                content.append($(`<div class="card border-info" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
                     <p>${item.text}</p>
-                    <a href="#" id="detail_${item.id}">More...</a>
+                    <a href="#" id="detail_${item.id}" style="color: rgb(0 165 187)">More...</a>
                     <p id="rating_${item.id}">Rating: ${item.rating}</p>
                     <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
                     <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a>
-                    <a class="btn btn-secondary" style="width: 105px" href="#" id="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
-                    <a class="btn btn-secondary" style="width: 105px" href="#" id="delete_${item.id}">Delete</a></p>
+                    <a class="btn btn-secondary" style="width: 73px" href="#" id="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
+                    <a class="btn btn-secondary" style="width: 73px" href="#" id="delete_${item.id}">Delete</a></p>
                 </div>`));
                 $('#detail_' + item.id).on('click', function (event) {
                     console.log('click');
@@ -273,57 +276,59 @@ function getQuotes() {
                 });
             });
         }).fail(function (response, status, message) {
-                console.log('Could not get quotes.');
-                console.log(response.responseText);
-            });
-    }
+            console.log('Could not get quotes.');
+            console.log(response.responseText);
+        });
+
 }
 
 function getOneQuote(id) {
-    let request = makeRequest('quote/' + id, 'get', true);
-    request.done(function (item) {
-        content.empty();
-        content.append($(`<div class="card" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
-                <p>${item.text}</p>
-                <p>Author: ${item.author}</p>
-                <p>Status: ${item.status}</p>
-                <p id="rating_${item.id}">Rating: ${item.rating}</p>
-                <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
-                <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a>
-                <a href="#" class="btn btn-secondary" style="width: 105px" id ="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
-                <a href="#" class="btn btn-secondary" style="width: 105px" id ="delete_${item.id}">Delete</a>
-                <a href="#" class="btn btn-secondary" style="width: 105px" id ="back_${item.id}">Back</a></p>
-            </div>`));
-        $('#rate_up_' + item.id).on('click', function (event) {
-            console.log('click');
-            event.preventDefault();
-            rateUp(item.id);
-        });
-        $('#rate_down_' + item.id).on('click', function (event) {
-            console.log('click');
-            event.preventDefault();
-            rateDown(item.id);
-        });
-        $('#edit_' + item.id).on('click', function(event) {
-            console.log('click');
-            event.preventDefault();
-            setUpEditQuote(item);
-        });
-        $('#delete_' + item.id).on('click', function(event) {
-            console.log('click');
-            event.preventDefault();
-            deleteQuote(item.id);
-        });
-        $('#back_' + item.id).on('click', function (event) {
-            console.log('click');
-            event.preventDefault();
+    let request = makeRequest('quote/' + id, 'get', false);
+    let token = getToken();
+    if (token) {request = makeRequest('quote/' + id, 'get', true);}
+        request.done(function (item) {
             content.empty();
-            getQuotes();
+            content.append($(`<div class="card" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
+                    <p>${item.text}</p>
+                    <p>Author: ${item.author}</p>
+                    <p>Status: ${item.status}</p>
+                    <p id="rating_${item.id}">Rating: ${item.rating}</p>
+                    <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
+                    <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a>
+                    <a href="#" class="btn btn-secondary" style="width: 73px" id ="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
+                    <a href="#" class="btn btn-secondary" style="width: 73px" id ="delete_${item.id}">Delete</a>
+                    <a href="#" class="btn btn-secondary" style="width: 73px" id ="back_${item.id}">Back</a></p>
+                </div>`));
+            $('#rate_up_' + item.id).on('click', function (event) {
+                console.log('click');
+                event.preventDefault();
+                rateUp(item.id);
+            });
+            $('#rate_down_' + item.id).on('click', function (event) {
+                console.log('click');
+                event.preventDefault();
+                rateDown(item.id);
+            });
+            $('#edit_' + item.id).on('click', function(event) {
+                console.log('click');
+                event.preventDefault();
+                setUpEditQuote(item);
+            });
+            $('#delete_' + item.id).on('click', function(event) {
+                console.log('click');
+                event.preventDefault();
+                deleteQuote(item.id);
+            });
+            $('#back_' + item.id).on('click', function (event) {
+                console.log('click');
+                event.preventDefault();
+                content.empty();
+                getQuotes();
+            });
+        }).fail(function (response, status, message) {
+            console.log('Quote is unavailable!');
+            console.log(response.responseText);
         });
-    }).fail(function (response, status, message) {
-        console.log('Quote is unavailable!');
-        console.log(response.responseText);
-    });
 }
 
 $(document).ready(function() {
@@ -331,7 +336,5 @@ $(document).ready(function() {
     setUpAuth();
     checkAuth();
     getQuotes();
-    getOneQuote();
     setUpCreateQuote();
-    setUpEditQuote();
 });
