@@ -302,10 +302,13 @@ function getOneQuote(id) {
                     <p id="rating_${item.id}">Rating: ${item.rating}</p>
                     <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
                     <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a>
-                    <a href="#" class="btn btn-secondary" style="width: 73px" id ="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
-                    <a href="#" class="btn btn-secondary" style="width: 73px" id ="delete_${item.id}">Delete</a>
                     <a href="#" class="btn btn-secondary" style="width: 73px" id ="back_${item.id}">Back</a></p>
                 </div>`));
+                if(token){
+                    content.append(`
+                    <a href="#" class="btn btn-secondary" style="width: 73px" id ="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
+                    <a href="#" class="btn btn-secondary" style="width: 73px" id ="delete_${item.id}">Delete</a>
+                `)}
             $('#rate_up_' + item.id).on('click', function (event) {
                 console.log('click');
                 event.preventDefault();
