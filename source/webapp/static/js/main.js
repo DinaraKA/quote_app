@@ -233,22 +233,28 @@ function deleteQuote(id){
 }
 
 function getQuotes() {
+
     let request = makeRequest('quote', 'get', false);
     let token = getToken();
     if (token) {request = makeRequest('quote', 'get', true);}
         request.done(function (data, status, response) {
             content.empty();
             console.log(data);
+
             data.forEach(function (item, index, array) {
-                content.append($(`<div class="card border-info" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
+                content.append($(`<div class="card border-info myCard" style="margin-top: 20px; padding: 10px" id="quote_${item.id}">
                     <p>${item.text}</p>
                     <a href="#" id="detail_${item.id}" style="color: rgb(0 165 187)">More...</a>
                     <p id="rating_${item.id}">Rating: ${item.rating}</p>
                     <p><a href="#" class="btn btn-secondary" style="width: 35px" id="rate_up_${item.id}">+</a>
                     <a href="#" class="btn btn-secondary" style="width: 35px" id="rate_down_${item.id}">-</a>
+                </div>`));
+                if(token){
+                content.append($(`
                     <a class="btn btn-secondary" style="width: 73px" href="#" id="edit_${item.id}" data-toggle="modal" data-target="#form_modal">Edit</a>
                     <a class="btn btn-secondary" style="width: 73px" href="#" id="delete_${item.id}">Delete</a></p>
-                </div>`));
+                `))
+                }
                 $('#detail_' + item.id).on('click', function (event) {
                     console.log('click');
                     event.preventDefault();
